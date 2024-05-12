@@ -6,7 +6,7 @@ const port = 5000;
 
 require("dotenv").config();
 const Project = require("./Project");
-const Blog = require("./Blog");
+const Blog = require("./Blogs");
 // there are two endpoints yet (/ , /project)
 
 app.get("/", (req, res) => {
