@@ -4,6 +4,8 @@ const express = require("express"); // create an express app
 const app = express();
 const port = 5000;
 
+app.use(express.json());
+
 require("dotenv").config();
 const Project = require("./Project");
 const Blog = require("./Blogs");
@@ -22,6 +24,51 @@ app.get("/projects", async (req, res) => {
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/projects', async (req, res) => {
+  console.log(req.body);
+
+  const project = new Project(req.body);
+
+  try {
+    const newProject = await project.save();
+    res.status(201).json(newProject);
+  } catch (err) {
+    res.status(400).json({message: err.message});
+  }
+});
+
+app.patch('/projects/:id', async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if(project){
+      project.set(req.body);
+      const updatedProject = await project.save();
+      res.json(updatedProject);
+    }else{
+      res.status(404).json({message: 'Project not found'});
+    }
+  } catch (err) {
+    res.status(500).json({message: err.message});
+  }
+});
+
+app.delete('/projects/:id', async (req, res) => {
+  const projectId = req.params.id;
+
+  try {
+      const project = await Project.findByIdAndDelete(projectId);
+
+      if (!project) {
+          return res.status(404).json({ error: 'Project not found' });
+      }
+
+      // Respond with a success message
+      res.json({message: 'Project deleted'}); 
+  } catch (error) {
+      res.status(500).json({ message: error.message });
   }
 });
 
