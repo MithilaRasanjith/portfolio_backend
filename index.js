@@ -82,6 +82,51 @@ app.get("/blogs", async (req, res) => {
   }
 });
 
+app.post('/blogs', async (req, res) => {
+  console.log(req.body);
+
+  const blog = new Blog(req.body);
+
+  try {
+    const newBlog = await blog.save();
+    res.status(201).json(newBlog);
+  } catch (err) {
+    res.status(400).json({message: err.message});
+  }
+});
+
+app.patch('/blogs/:id', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if(blog){
+      blog.set(req.body);
+      const updatedBlog = await blog.save();
+      res.json(updatedBlog);
+    }else{
+      res.status(404).json({message: 'Blog not found'});
+    }
+  } catch (err) {
+    res.status(500).json({message: err.message});
+  }
+});
+
+app.delete('/blogs/:id', async (req, res) => {
+  const blogId = req.params.id;
+
+  try {
+      const blog = await Blog.findByIdAndDelete(blogId);
+
+      if (!blog) {
+          return res.status(404).json({ error: 'Blog not found' });
+      }
+
+      // Respond with a success message
+      res.json({message: 'Blog deleted'}); 
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+});
+
 app.get("/students", async (req, res) => {
   // this is an endpoint
   try {
